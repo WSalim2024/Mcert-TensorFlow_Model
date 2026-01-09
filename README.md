@@ -1,15 +1,20 @@
 <div align="center">
 
-# ✍️ Handwritten Character Recognition (OCR) System
+# 🤖 Hybrid AI Recognition System
+
+### TensorFlow + PyTorch
 
 [![Python](https://img.shields.io/badge/Python-3.8+-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://python.org)
 [![TensorFlow](https://img.shields.io/badge/TensorFlow-2.x-FF6F00?style=for-the-badge&logo=tensorflow&logoColor=white)](https://tensorflow.org)
+[![PyTorch](https://img.shields.io/badge/PyTorch-2.x-EE4C2C?style=for-the-badge&logo=pytorch&logoColor=white)](https://pytorch.org)
 [![License](https://img.shields.io/badge/License-MIT-green?style=for-the-badge)](LICENSE)
 [![Status](https://img.shields.io/badge/Status-Active-success?style=for-the-badge)]()
 
-*A real-time OCR application powered by Deep Learning for recognizing handwritten digits and letters*
+*A Dual-Engine AI System integrating TensorFlow and PyTorch into a single unified dashboard*
 
-[Features](#-key-features) • [Installation](#-installation--setup) • [Usage](#-usage-guide) • [Troubleshooting](#-troubleshooting)
+[Features](#-key-features) • [Architecture](#-architecture) • [Installation](#-installation--setup) • [Usage](#-usage-guide)
+
+**Version 1.2**
 
 </div>
 
@@ -17,22 +22,42 @@
 
 ## 📖 Project Overview
 
-This project is a real-time **Optical Character Recognition (OCR)** application powered by Deep Learning. It allows users to draw handwritten characters (digits 0–9 and letters A–Z) on a digital canvas and instantly receive a prediction from a trained AI model.
+This project is a **Dual-Engine AI System** that integrates two powerful Deep Learning frameworks into a single dashboard. It allows users to switch between:
 
-Unlike standard MNIST implementations that only recognize digits, this engine utilizes the **EMNIST (Balanced)** dataset, enabling it to classify **47 distinct classes** of alphanumeric characters with high accuracy.
+| Engine | Framework | Dataset | Purpose |
+|--------|-----------|---------|---------|
+| 🔤 **Character Recognition (OCR)** | TensorFlow | EMNIST | Recognize handwritten digits & letters |
+| 🎯 **Object Detection** | PyTorch | CIFAR-10 | Identify objects from sketches |
+
+The goal is to demonstrate how different neural network architectures (Custom CNNs) and frameworks can coexist in a modular Python application.
 
 ---
 
 ## 🏗️ Architecture
 
-> **The "Factory & Product" Model**
+> **The "Factory & Product" Model with Unified Frontend**
 
-The system is divided into two distinct components to separate training logic from inference:
+```
+┌─────────────────────────────────────────────────────────────┐
+│                    🖥️ unified_app.py                        │
+│                   (Tkinter Dashboard)                       │
+├─────────────────────────┬───────────────────────────────────┤
+│    📝 Character Mode    │         🎨 Object Mode            │
+├─────────────────────────┼───────────────────────────────────┤
+│   my_emnist_model.h5    │        cifar_net.pth              │
+│      (TensorFlow)       │          (PyTorch)                │
+└─────────────────────────┴───────────────────────────────────┘
+```
 
-| Component | File | Description |
-|-----------|------|-------------|
-| **🏭 The Factory** | `main.py` | A robust TensorFlow pipeline that downloads the EMNIST dataset, pre-processes the data (normalization, rotation, reshaping), constructs a Deep Neural Network, trains it over multiple epochs, and saves the model (`.h5`). |
-| **📦 The Product** | `gui_app.py` | A user-friendly desktop interface built with Tkinter. Loads the pre-trained model and provides a 500×500 drawing canvas with real-time image preprocessing. |
+### Component Breakdown
+
+| Type | Component | File | Description |
+|------|-----------|------|-------------|
+| 🏭 | **Factory** | `main.py` | Trains TensorFlow model for character recognition |
+| 🏭 | **Factory** | `pytorch_train.py` | Trains PyTorch model for object detection |
+| 📦 | **Product** | `unified_app.py` | Tkinter dashboard that dynamically loads the appropriate AI backend |
+| 🧠 | **Brain** | `my_emnist_model.h5` | TensorFlow character weights |
+| 🧠 | **Brain** | `cifar_net.pth` | PyTorch object weights |
 
 ---
 
@@ -40,11 +65,11 @@ The system is divided into two distinct components to separate training logic fr
 
 | Feature | Description |
 |---------|-------------|
-| 🔤 **Extended Recognition** | Supports 0–9, A–Z, and select lowercase letters (47 classes total) |
-| 🧠 **Deep Learning Backend** | Built on TensorFlow/Keras with a custom Sequential CNN architecture |
-| 🖥️ **Interactive UI** | Large drawing canvas with "Clear" and "Predict" functionality |
-| 📊 **Confidence Scoring** | Displays predicted character with model confidence percentage |
-| ⚙️ **Robust Preprocessing** | Handles image transposition and scaling for EMNIST orientation quirks |
+| 🔀 **Hybrid Backend** | Seamlessly switches between TensorFlow (Grayscale/28×28) and PyTorch (RGB/32×32) pipelines |
+| 🔤 **47-Class OCR** | Recognizes Digits (0–9) and Letters (A–Z) using EMNIST Balanced |
+| 🎯 **10-Class Object Detection** | Identifies sketches of Planes, Cars, Birds, Cats, and more using CIFAR-10 |
+| ⚡ **Real-Time Inference** | Instant prediction on drawn canvas inputs |
+| 🔧 **Smart Preprocessing** | Auto-handles resizing, normalization, and transposition for both frameworks |
 
 ---
 
@@ -80,10 +105,11 @@ pip install -r requirements.txt
 <summary>📦 Key Libraries</summary>
 
 - `tensorflow`
-- `numpy`
+- `torch`
+- `torchvision`
 - `emnist`
 - `pillow` (PIL)
-- `matplotlib`
+- `numpy`
 
 </details>
 
@@ -91,9 +117,11 @@ pip install -r requirements.txt
 
 ## 💻 Usage Guide
 
-### 1. Build the Brain (Training)
+### 1. Build the Brains (Training)
 
-> ⚠️ **Note:** Only necessary if `my_emnist_model.h5` is missing or you wish to retrain.
+> ⚠️ **Important:** You must generate the model files before running the app.
+
+#### Train Character Recognizer (TensorFlow)
 
 ```bash
 python main.py
@@ -101,44 +129,42 @@ python main.py
 
 | Parameter | Value |
 |-----------|-------|
-| ⏱️ Duration | 2–5 minutes (CPU/GPU dependent) |
 | 📁 Output | `my_emnist_model.h5` |
+| 🔤 Classes | 47 (digits + letters) |
 
-### 2. Launch the Application (Inference)
+#### Train Object Detector (PyTorch)
 
 ```bash
-python gui_app.py
+python pytorch_train.py
+```
+
+| Parameter | Value |
+|-----------|-------|
+| 📁 Output | `cifar_net.pth` |
+| 🎯 Classes | 10 (plane, car, bird, cat, etc.) |
+
+### 2. Launch the Unified Dashboard
+
+```bash
+python unified_app.py
 ```
 
 **How to use:**
 
-1. ✏️ Draw a character in the black box
-2. 🔮 Click **PREDICT** to see the AI's result
-3. 🧹 Click **CLEAR** to reset the canvas
-
----
-
-## ⚠️ Troubleshooting
-
-<details>
-<summary><strong>🔴 "BadZipFile" Error during training</strong></summary>
-
-If the EMNIST download fails or gets corrupted due to network firewalls:
-
-1. Download `gzip.zip` manually from the [NIST website](https://www.nist.gov/itl/products-and-services/emnist-dataset)
-2. Rename it to `emnist.zip`
-3. Place it in your user cache folder: `~/.cache/emnist/`
-4. Rerun `main.py`
-
-</details>
+| Step | Action |
+|------|--------|
+| 1️⃣ | Select **"Read Characters"** to draw numbers/letters |
+| 2️⃣ | Select **"See Objects"** to draw shapes (cars, birds, etc.) |
+| 3️⃣ | Draw on the canvas |
+| 4️⃣ | Click **ACTIVATE AI** to predict |
 
 ---
 
 ## ⚖️ Disclaimer
 
-> This software is provided **"as is"**, without warranty of any kind, express or implied. It is intended for **educational and research purposes** to demonstrate machine learning capabilities using TensorFlow.
+> This software is provided **"as is"** for **educational purposes**.
 
-While the model achieves high accuracy on the test dataset, real-world performance depends heavily on the user's drawing style (mouse vs. stylus) and input consistency. The author accepts no liability for any errors or issues arising from the use of this code.
+⚠️ **Accuracy Note:** The Object Detector (PyTorch) was trained on photographs (CIFAR-10), so asking it to recognize hand-drawn sketches is an **experimental challenge**. Accuracy on sketches will be lower than on photos.
 
 ---
 
